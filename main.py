@@ -9,9 +9,9 @@ class AntColony:
 class FileReader:
     def __init__(self, file_path: str) -> None:
         with open(file_path) as f:
-            file_contents = f.read().rstrip("\n") #read file and remove trailing newline
+            file_contents = f.read().strip()
             data = re.split('\n[ ]+\n', file_contents)
-            self.number_of_nodes = int(data[0].replace(" ", ""))
+            self.number_of_nodes = int(data[0])
             self.distance_matrix = [[int(y) for y in x.split()] for x in data[1].split("\n")]
             self.flow_matrix = [[int(y) for y in x.split()] for x in data[2].split("\n")]
     
