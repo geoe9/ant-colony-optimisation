@@ -6,10 +6,20 @@ class AntColony:
         self.evaporation_rate = evaporation_rate
         self.number_of_nodes, self.distance_matrix, self.flow_matrix = data
 
-        # compute heuristic matrix
+        # compute initial heuristic matrix
         self.heuristic_matrix = [[round(1 / self.distance_matrix[i][j], 4) if i != j else 0 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
         # initalise pheromone matrix
         self.pheromone_matrix = [[1 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
+    
+    def run(self):
+        self.number_of_fitness_evaluations = 0
+        if self.number_of_fitness_evaluations <= 10_000:
+            # loop
+            pass
+
+class Ant:
+    def __init__(self, colony: AntColony):
+        self.colony = colony
 
 class FileReader:
     '''
