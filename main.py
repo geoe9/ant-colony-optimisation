@@ -1,11 +1,15 @@
 import re
 
 class AntColony:
-    def __init__(self, number_of_ants: int, evaporation_rate: float, data: list) -> None:
+    def __init__(self, number_of_ants: int, evaporation_rate: float, data: tuple[int, list[list[int], list[list[int]]]]) -> None:
         self.number_of_ants = number_of_ants
         self.evaporation_rate = evaporation_rate
         self.number_of_nodes, self.distance_matrix, self.flow_matrix = data
-        self.pherimone_matrix = [[1 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
+
+        # compute heuristic matrix
+        self.heuristic_matrix = [[round(1 / self.distance_matrix[i][j], 4) if i != j else 0 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
+        # initalise pheromone matrix
+        self.pheromone_matrix = [[1 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
 
 class FileReader:
     '''
