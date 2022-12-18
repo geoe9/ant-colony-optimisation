@@ -7,7 +7,7 @@ class AntColony:
         self.number_of_nodes, self.distance_matrix, self.flow_matrix = data
 
         # compute initial heuristic matrix
-        self.heuristic_matrix = [[round(1 / self.distance_matrix[i][j], 4) if i != j else 0 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
+        self.heuristic_matrix = [[round(1 / (self.distance_matrix[i][j] * self.flow_matrix[i][j]), 4) if i != j else 0 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
         # initalise pheromone matrix
         self.pheromone_matrix = [[1 for j in range(self.number_of_nodes)] for i in range(self.number_of_nodes)]
     
