@@ -1,6 +1,6 @@
-import re
-import numpy as np
-from tqdm import tqdm
+import re # regex used for reading file
+import numpy as np # numpy used for array handling
+from tqdm import tqdm # tqdm used for progress bar
 
 class AntColony:
     def __init__(self, number_of_ants: int, evaporation_rate: float, data: tuple[int, list[list[int], list[list[int]]]]) -> None:
@@ -12,9 +12,13 @@ class AntColony:
         self.pheromone_matrix = [[np.random.random() if i != j else 0 for j in range(self.number_of_nodes + 1)] for i in range(self.number_of_nodes + 1)]
     
     def run(self, iterations = 10_000):
+        # initalise all ants
         ants = [Ant(self) for _ in range(self.number_of_ants)]
+        
+        # initalise variables to store 'best' solution
         best_fitness = None
         best_path = None
+        
         progress_bar = tqdm(range(iterations))
         for i in progress_bar:
             for ant in ants:
@@ -30,13 +34,19 @@ class AntColony:
         print(f'\nSimulation complete.\nBest fitness: {best_fitness:,d}\nPath: {best_path}')
             
     def evaporatePheromones(self):
-        self.pheromone_matrix = [np.multiply(i, self.evaporation_rate) for i in self.pheromone_matrix]
+        '''
+        Multiplies all values in the pheromone matrix by the evaporation rate to simulate pheromone evaporation/decay.
+        '''
+        self.pheromone_matrix = np.multiply(self.pheromone_matrix, self.evaporation_rate)
 
 class Ant:
     def __init__(self, colony: AntColony):
         self.colony = colony
 
     def calculatePath(self) -> list:
+        '''
+        Generate a permutation.
+        '''
         self.current_node = 0
         self.allowed_nodes = [1 if i != 0 else 0 for i in range(self.colony.number_of_nodes + 1)]
         self.path = []
@@ -45,6 +55,9 @@ class Ant:
         return self.path
 
     def chooseNextNode(self) -> None:
+        '''
+        Chooses next node randomly, with bias towards nodes with more pheromone.
+        '''
         next_node_weightings = np.multiply([i for i in self.colony.pheromone_matrix[self.current_node]], self.allowed_nodes)
         next_node_probabilities = np.array(next_node_weightings) / np.sum(next_node_weightings)
         next_node = np.random.choice(self.colony.number_of_nodes + 1, p = next_node_probabilities)
@@ -54,6 +67,7 @@ class Ant:
 
     def calculatePathFitness(self) -> float:
         '''
+        Calculates the fitness of a generated permutation.
         Note that lower fitness is better in this case.
         '''
         self.fitness = 0
@@ -63,7 +77,10 @@ class Ant:
         return self.fitness
 
     def updatePheromones(self) -> None:
-        pheromone_amount = 100000 / self.fitness
+        '''
+        Updates the global pheromone matrix with values proportionate to fitness of the ant's generated permutation.
+        '''
+        pheromone_amount = 1 / self.fitness
         self.colony.pheromone_matrix[0][self.path[0]] += pheromone_amount
         for i in range(0, len(self.path) - 1):
             self.colony.pheromone_matrix[self.path[i]][self.path[i+1]] += pheromone_amount
@@ -88,5 +105,6 @@ class FileReader:
         '''
         return self.number_of_nodes, self.distance_matrix, self.flow_matrix
 
-colony = AntColony(10, 0.9, FileReader("uni50a.dat").getData())
+file_data = FileReader("uni50a.dat").getData()
+colony = AntColony(10, 0.9, file_data)
 colony.run()
