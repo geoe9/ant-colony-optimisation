@@ -2,6 +2,7 @@ import re # regex used for reading file
 import numpy as np # numpy used for array handling
 from tqdm import tqdm # tqdm used for progress bar
 import matplotlib.pyplot as plt # used to produce graphs from results
+import os # used to create results folder if it doesn't exist
 
 class AntColony:
     def __init__(self, number_of_ants: int, evaporation_rate: float, data: tuple[int, list[list[int], list[list[int]]]]) -> None:
@@ -152,6 +153,10 @@ class FileReader:
 if __name__ == "__main__":
     # read file
     file_data = FileReader("uni50a.dat").getData()
+
+    # create results folder if it doesn't exit
+    if not os.path.exists("results"):
+        os.mkdir("results")
 
     # list of simluations to run (m, e)
     tests = [(100, 0.9)]
