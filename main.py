@@ -25,23 +25,20 @@ class AntColony:
         
         progress_bar = tqdm(range(fitness_evaluations))
         for i in progress_bar:
-            iteration_best_fitness = None
-            iteration_best_path = None
-            for ant in ants:
-                path = ant.calculatePath()
-                fitness = ant.calculatePathFitness()
-                if iteration_best_fitness is None or fitness < iteration_best_fitness:
-                    iteration_best_fitness = fitness
-                    iteration_best_path = path
-            for ant in ants:
-                ant.updatePheromones()
-            self.results.append(iteration_best_fitness)
-            if self.best_fitness is None or iteration_best_fitness < self.best_fitness:
-                self.best_fitness = iteration_best_fitness
-                best_path = iteration_best_path
-            self.evaporatePheromones()
-            progress_bar.set_description(f'\rBest fitness:\t{self.best_fitness:,d}')
-        print(f'Simulation complete.\nBest fitness: {self.best_fitness:,d}\nPath: {best_path}\n')
+            ant_number = 0
+            path = ants[ant_number].calculatePath()
+            fitness = ants[ant_number].calculatePathFitness()
+            if self.best_fitness is None or fitness < self.best_fitness:
+                self.best_fitness = fitness
+                best_path = path
+            self.results.append(fitness)
+            if ant_number > self.number_of_ants - 2:
+                for ant in ants:
+                    ant.updatePheromones()
+                ant_number = 0
+                self.evaporatePheromones
+            progress_bar.set_description_str(f'\rBest fitness:\t{self.best_fitness:,d}')
+        print(f'Simulation complete.\nBest fitness: {self.best_fitness:,d}\nPath: {best_path}\n')           
             
     def evaporatePheromones(self):
         '''
