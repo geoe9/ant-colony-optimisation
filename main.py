@@ -1,6 +1,7 @@
 import re # regex used for reading file
 import numpy as np # numpy used for array handling
 from tqdm import tqdm # tqdm used for progress bar
+import matplotlib.pyplot as plt # used to produce graphs from results
 
 class AntColony:
     def __init__(self, number_of_ants: int, evaporation_rate: float, data: tuple[int, list[list[int], list[list[int]]]]) -> None:
@@ -11,27 +12,36 @@ class AntColony:
         # initalise pheromone matrix
         self.pheromone_matrix = [[np.random.random() if i != j else 0 for j in range(self.number_of_nodes + 1)] for i in range(self.number_of_nodes + 1)]
     
-    def run(self, iterations = 10_000):
+    def run(self, fitness_evaluations = 10_000):
         # initalise all ants
         ants = [Ant(self) for _ in range(self.number_of_ants)]
         
         # initalise variables to store 'best' solution
-        best_fitness = None
+        self.best_fitness = None
         best_path = None
+
+        # initalise array to store results
+        self.results = []
         
-        progress_bar = tqdm(range(iterations))
+        progress_bar = tqdm(range(fitness_evaluations))
         for i in progress_bar:
+            iteration_best_fitness = None
+            iteration_best_path = None
             for ant in ants:
                 path = ant.calculatePath()
                 fitness = ant.calculatePathFitness()
-                if best_fitness is None or fitness < best_fitness:
-                    best_fitness = fitness
-                    best_path = path
+                if iteration_best_fitness is None or fitness < iteration_best_fitness:
+                    iteration_best_fitness = fitness
+                    iteration_best_path = path
             for ant in ants:
                 ant.updatePheromones()
+            self.results.append(iteration_best_fitness)
+            if self.best_fitness is None or iteration_best_fitness < self.best_fitness:
+                self.best_fitness = iteration_best_fitness
+                best_path = iteration_best_path
             self.evaporatePheromones()
-            progress_bar.set_description(f'\rBest fitness:\t{best_fitness:,d}')
-        print(f'\nSimulation complete.\nBest fitness: {best_fitness:,d}\nPath: {best_path}')
+            progress_bar.set_description(f'\rBest fitness:\t{self.best_fitness:,d}')
+        print(f'Simulation complete.\nBest fitness: {self.best_fitness:,d}\nPath: {best_path}\n')
             
     def evaporatePheromones(self):
         '''
@@ -84,7 +94,6 @@ class Ant:
         self.colony.pheromone_matrix[0][self.path[0]] += pheromone_amount
         for i in range(0, len(self.path) - 1):
             self.colony.pheromone_matrix[self.path[i]][self.path[i+1]] += pheromone_amount
-            self.colony.pheromone_matrix[self.path[i+1]][self.path[i]] += pheromone_amount
 
 class FileReader:
     '''
@@ -105,6 +114,18 @@ class FileReader:
         '''
         return self.number_of_nodes, self.distance_matrix, self.flow_matrix
 
-file_data = FileReader("uni50a.dat").getData()
-colony = AntColony(10, 0.9, file_data)
-colony.run()
+if __name__ == "__main__":
+    file_data = FileReader("uni50a.dat").getData()
+
+    tests = [(100, 0.9), (100, 0.5), (10, 0.9), (10, 0.5)]
+
+    for test in tests:
+        for i in range(5):
+            colony = AntColony(test[0], test[1], file_data)
+            colony.run()
+            figure = plt.figure()
+            plt.plot(colony.results)
+            plt.title(f'm = {test[0]}, e = {test[1]}')
+            plt.suptitle(f'Best fitness: {colony.best_fitness:,d}')
+            plt.xlabel("Iteration"); plt.ylabel("Fitness")
+            figure.savefig(fname=f'results/m{test[0]}_e{test[1]}_{i}.png')
