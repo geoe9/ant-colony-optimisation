@@ -13,6 +13,9 @@ class AntColony:
         self.pheromone_matrix = [[np.random.random() if i != j else 0 for j in range(self.number_of_nodes + 1)] for i in range(self.number_of_nodes + 1)]
     
     def run(self, fitness_evaluations = 10_000):
+        '''
+        Runs the simulation until the provided number of fitness evaluations have been reached (default 10,000).
+        '''
         # initalise all ants
         ants = [Ant(self) for _ in range(self.number_of_ants)]
         
@@ -23,7 +26,7 @@ class AntColony:
         # initalise array to store results
         self.results = []
         
-        progress_bar = tqdm(range(fitness_evaluations))
+        progress_bar = tqdm(range(fitness_evaluations), f'Running simulation (m={self.number_of_ants}, e={self.evaporation_rate})')
         for i in progress_bar:
             ant_number = 0
             path = ants[ant_number].calculatePath()
@@ -37,7 +40,6 @@ class AntColony:
                     ant.updatePheromones()
                 ant_number = 0
                 self.evaporatePheromones
-            progress_bar.set_description_str(f'\rBest fitness:\t{self.best_fitness:,d}')
         print(f'Simulation complete.\nBest fitness: {self.best_fitness:,d}\nPath: {best_path}\n')           
             
     def evaporatePheromones(self):
