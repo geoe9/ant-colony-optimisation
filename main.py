@@ -12,7 +12,7 @@ class AntColony:
         # initalise pheromone matrix
         self.pheromone_matrix = [[np.random.random() if i != j else 0 for j in range(self.number_of_nodes + 1)] for i in range(self.number_of_nodes + 1)]
     
-    def run(self, fitness_evaluations = 10_000):
+    def run(self, fitness_evaluations: int = 10_000) -> None:
         '''
         Runs the simulation until the provided number of fitness evaluations have been reached (default 10,000).
         '''
@@ -48,7 +48,7 @@ class AntColony:
         # output results once simulation complete
         print(f'Simulation complete.\nBest fitness: {self.best_fitness:,d}\nPath: {best_path}\n')           
             
-    def evaporatePheromones(self):
+    def evaporatePheromones(self) -> None:
         '''
         Multiplies all values in the pheromone matrix by the evaporation rate to simulate pheromone evaporation/decay.
         '''
