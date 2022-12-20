@@ -26,7 +26,9 @@ class AntColony:
         # initalise array to store results
         self.results = []
         
+        # initalise progress bar to track simulations
         progress_bar = tqdm(range(fitness_evaluations), f'Running simulation (m={self.number_of_ants}, e={self.evaporation_rate})')
+
         for i in progress_bar:
             ant_number = 0
             path = ants[ant_number].calculatePath()
@@ -35,11 +37,15 @@ class AntColony:
                 self.best_fitness = fitness
                 best_path = path
             self.results.append(fitness)
+            
+            # update pheromones when all ants have completed fitness evaluations
             if ant_number > self.number_of_ants - 2:
                 for ant in ants:
                     ant.updatePheromones()
                 ant_number = 0
                 self.evaporatePheromones
+
+        # output results once simulation complete
         print(f'Simulation complete.\nBest fitness: {self.best_fitness:,d}\nPath: {best_path}\n')           
             
     def evaporatePheromones(self):
@@ -114,14 +120,19 @@ class FileReader:
         return self.number_of_nodes, self.distance_matrix, self.flow_matrix
 
 if __name__ == "__main__":
+    # read file
     file_data = FileReader("uni50a.dat").getData()
 
+    # list of simluations to run (m, e)
     tests = [(100, 0.9), (100, 0.5), (10, 0.9), (10, 0.5)]
 
     for test in tests:
+        # run each simulation 5 times
         for i in range(5):
             colony = AntColony(test[0], test[1], file_data)
             colony.run()
+            
+            # plot results with matplotlib.pyplot
             figure = plt.figure()
             plt.plot(colony.results)
             plt.title(f'm = {test[0]}, e = {test[1]}')
